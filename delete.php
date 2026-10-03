@@ -1,39 +1,15 @@
-```php
 <?php
+require_once 'db.php';
+require_once 'auth.php';
+require_login();
 
-include 'db.php';
-
-
-// Check if ID exists
-
-if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
-
-    header("Location: index.php");
-
-    exit();
-
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    csrf_check();
+    $id = (int)($_POST['id'] ?? 0);
+    $stmt = mysqli_prepare($conn, "DELETE FROM attendance WHERE id = ?");
+    mysqli_stmt_bind_param($stmt, "i", $id);
+    mysqli_stmt_execute($stmt);
+    flash("Attendance record deleted.");
 }
-
-
-$id = (int) $_GET['id'];
-
-
-// Delete record
-
-$sql = "DELETE FROM attendance WHERE id = ?";
-
-$stmt = mysqli_prepare($conn, $sql);
-
-mysqli_stmt_bind_param($stmt, "i", $id);
-
-mysqli_stmt_execute($stmt);
-
-
-// Return to main page
-
 header("Location: index.php");
-
 exit();
-
-?>
-```
